@@ -3,9 +3,11 @@ import { submitFeedback } from "../api";
 import { hasFeedbackContent } from "../feedback";
 
 export function CitizenPage({ user }) {
+  const maximumMessageLength = 500;
   const [message, setMessage] = useState("");
   const [category, setCategory] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submissionReference, setSubmissionReference] = useState("");
   const [error, setError] = useState("");
 
   async function handleSubmit(event) {
@@ -16,7 +18,8 @@ export function CitizenPage({ user }) {
       return;
     }
     try {
-      await submitFeedback({ nric: user.nric, name: user.name, message, category });
+      const response = await submitFeedback({ nric: user.nric, name: user.name, message, category });
+      setSubmissionReference(response.feedback.reference);
       setSubmitted(true);
       setMessage("");
       setCategory("");
@@ -39,6 +42,28 @@ export function CitizenPage({ user }) {
             <button className="primary-button" type="button" onClick={() => setSubmitted(false)}>
               Submit another
             </button>
+        {submitted && (
+          <div className="success-banner">
+            Thank you. Your feedback has been received. Your reference is <strong>{submissionReference}</strong>.
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
+          <label>Your feedback
+            <textarea rows="7" value={message} maxLength={maximumMessageLength} onChange={(event) => setMessage(event.target.value)} placeholder="Share your feedback here..." />
+          </label>
+          <p className="muted" aria-live="polite">{message.length} / {maximumMessageLength} characters</p>
+          <label htmlFor="feedback-category">Category
+            <select id="feedback-category" value={category} onChange={(event) => setCategory(event.target.value)} required>
+              <option value="" disabled>Choose a category</option>
+              <option value="Estate">Estate</option>
+              <option value="Transport">Transport</option>
+              <option value="Environment">Environment</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+          <div className="form-footer">
+            <span className="muted">Please do not include sensitive personal information.</span>
+            <button className="primary-button">Submit feedback</button>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
