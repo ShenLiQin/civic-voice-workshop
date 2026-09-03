@@ -20,6 +20,10 @@ export function login(credentials) {
 export function submitFeedback(feedback) {
   return api("/api/feedback", { method: "POST", body: JSON.stringify(feedback) });
 }
-export function getFeedback(token) {
-  return api("/api/feedback", { headers: { Authorization: `Bearer ${token}` } });
+export function getFeedback(token, filters = {}) {
+  const query = new URLSearchParams();
+  if (filters.category) query.set("category", filters.category);
+  if (filters.status) query.set("status", filters.status);
+  const suffix = query.size ? `?${query}` : "";
+  return api(`/api/feedback${suffix}`, { headers: { Authorization: `Bearer ${token}` } });
 }

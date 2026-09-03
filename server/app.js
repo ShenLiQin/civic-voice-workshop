@@ -4,6 +4,7 @@ import cors from "cors";
 import { createDb } from "./lib/db.js";
 
 const feedbackCategories = ["Estate", "Transport", "Environment", "Other"];
+const feedbackStatuses = ["New", "In review", "Closed"];
 
 function passwordMatches(password, passwordHash) {
   if (typeof password !== "string" || typeof passwordHash !== "string") return false;
@@ -60,10 +61,17 @@ export async function createApp(options = {}) {
     return next();
   }
 
-  app.get("/api/feedback", requireAdmin, (_req, res) => {
-    const feedback = [...db.data.feedback].sort(
+  app.get("/api/feedback", requireAdmin, (req, res) => {
+    const { category, status } = req.query;
+    let feedback = [...db.data.feedback].sort(
       (first, second) => new Date(second.createdAt) - new Date(first.createdAt),
     );
+    if (typeof category === "string" && feedbackCategories.includes(category)) {
+      feedback = feedback.filter((item) => item.category === category);
+    }
+    if (typeof status === "string" && feedbackStatuses.includes(status)) {
+      feedback = feedback.filter((item) => item.status === status);
+    }
     return res.json({ feedback });
   });
 
