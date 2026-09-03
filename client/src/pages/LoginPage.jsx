@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { login } from "../api";
+import { isValidWorkshopId, normalizeWorkshopId } from "../workshopId";
 
 export function LoginPage({ onLogin }) {
   const [role, setRole] = useState("citizen");
@@ -10,10 +11,15 @@ export function LoginPage({ onLogin }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setBusy(true);
     setError("");
+    if (!isValidWorkshopId(nric)) {
+      setError("Enter a valid workshop ID, such as S0000001A.");
+      return;
+    }
+
+    setBusy(true);
     try {
-      const session = await login({ nric, password, role });
+      const session = await login({ nric: normalizeWorkshopId(nric), password, role });
       onLogin(session);
     } catch (requestError) {
       setError(requestError.status === 429 ? "Too many sign-in attempts. Please wait and try again." : requestError.message);
@@ -44,12 +50,18 @@ export function LoginPage({ onLogin }) {
           </div>
           <form onSubmit={handleSubmit}>
             <label>NRIC
-              <input value={nric} onChange={(event) => setNric(event.target.value)} placeholder="e.g. S0000001A" />
+              <input
+                value={nric}
+                onChange={(event) => setNric(event.target.value)}
+                placeholder="e.g. S0000001A"
+                autoCapitalize="characters"
+                aria-describedby={error ? "login-error" : undefined}
+              />
             </label>
             <label>Password
               <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" />
             </label>
-            {error && <p className="error-message">{error}</p>}
+            {error && <p id="login-error" className="error-message">{error}</p>}
             <button className="primary-button" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
           </form>
           <details className="demo-help">
