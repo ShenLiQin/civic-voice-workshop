@@ -3,6 +3,7 @@
 body { margin: 0; min-width: 320px; }
 button, input, textarea, select { font: inherit; }
 button { cursor: pointer; }
+.theme-toggle { border: 1px solid #d5d2cb; border-radius: 999px; padding: 7px 10px; background: white; color: #38434a; font-size: 13px; font-weight: 700; }
 .site-header { height: 76px; display: flex; align-items: center; justify-content: space-between; padding: 0 5vw; border-bottom: 1px solid #e2dfd7; background: rgba(255,255,255,.88); }
 .brand { display: flex; align-items: center; gap: 10px; color: #17222b; text-decoration: none; font-weight: 700; }
 .brand-mark { width: 29px; height: 29px; display: grid; place-items: center; background: #b2252a; color: #fff; border-radius: 8px; font-family: Fraunces, serif; }
@@ -56,6 +57,29 @@ textarea { resize: vertical; line-height: 1.6; }
 .status-pill, .category-pill { align-self: flex-start; white-space: nowrap; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; }
 .status-pill { background: #fff1df; color: #9a5b00; }
 .category-pill { background: #e9f1fb; color: #245b93; }
+:root[data-theme="dark"] { color: #edf1f2; background: #15191c; color-scheme: dark; }
+:root[data-theme="dark"] body { background: #15191c; }
+:root[data-theme="dark"] .site-header { border-color: #38434a; background: rgba(25, 30, 34, .94); }
+:root[data-theme="dark"] .brand { color: #f7f5f0; }
+:root[data-theme="dark"] .theme-toggle { border-color: #59646b; background: #252c31; color: #f7f5f0; }
+:root[data-theme="dark"] .text-button { color: #ff8785; }
+:root[data-theme="dark"] .signed-in, :root[data-theme="dark"] .muted, :root[data-theme="dark"] .demo-help, :root[data-theme="dark"] .page-heading p, :root[data-theme="dark"] .list-header span, :root[data-theme="dark"] .feedback-meta, :root[data-theme="dark"] .summary-card span { color: #bac4c8; }
+:root[data-theme="dark"] .login-panel { background: #1c2226; }
+:root[data-theme="dark"] .intro-panel { background: #791e25; }
+:root[data-theme="dark"] .intro-panel > p { color: #ffe4d4; }
+:root[data-theme="dark"] label { color: #e5e9ea; }
+:root[data-theme="dark"] input, :root[data-theme="dark"] textarea, :root[data-theme="dark"] select { border-color: #59646b; background: #252c31; color: #f7f5f0; }
+:root[data-theme="dark"] .role-switch { background: #30383e; }
+:root[data-theme="dark"] .role-switch button { color: #bac4c8; }
+:root[data-theme="dark"] .role-switch button.active { background: #252c31; color: #f7f5f0; }
+:root[data-theme="dark"] .primary-button { background: #cf444b; }
+:root[data-theme="dark"] .primary-button:hover { background: #e35c61; }
+:root[data-theme="dark"] .form-card, :root[data-theme="dark"] .feedback-list { background: #1c2226; border-color: #38434a; box-shadow: 0 8px 30px rgba(0,0,0,.2); }
+:root[data-theme="dark"] .feedback-row, :root[data-theme="dark"] .list-header { border-color: #38434a; }
+:root[data-theme="dark"] .success-banner { background: #183c29; color: #aee9bd; }
+:root[data-theme="dark"] .category-pill { background: #1d3b59; color: #b9dbff; }
+:root[data-theme="dark"] .status-pill { background: #4a3519; color: #ffd08a; }
+:root[data-theme="dark"] .error-message { color: #ff9894; }
 @media (max-width: 760px) {
   .split-layout { grid-template-columns: 1fr; }
   .intro-panel { min-height: 360px; padding: 58px 8vw; }
