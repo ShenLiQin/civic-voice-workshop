@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { submitFeedback } from "../api";
 import { hasFeedbackContent } from "../feedback";
 
@@ -8,13 +8,36 @@ export function CitizenPage({ user }) {
   const [category, setCategory] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submissionReference, setSubmissionReference] = useState("");
-  const [error, setError] = useState("");
+  const [messageError, setMessageError] = useState("");
+  const [categoryError, setCategoryError] = useState("");
+  const [submissionError, setSubmissionError] = useState("");
+  const messageInputRef = useRef(null);
+  const categoryInputRef = useRef(null);
+  const announcementRef = useRef(null);
+
+  useEffect(() => {
+    if (messageError) {
+      messageInputRef.current?.focus();
+    } else if (categoryError) {
+      categoryInputRef.current?.focus();
+    } else if (submissionError) {
+      announcementRef.current?.focus();
+    } else if (submitted) {
+      announcementRef.current?.focus();
+    }
+  }, [categoryError, messageError, submissionError, submitted]);
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setError("");
+    setMessageError("");
+    setCategoryError("");
+    setSubmissionError("");
     if (!hasFeedbackContent(message)) {
-      setError("Please enter feedback that is not blank.");
+      setMessageError("Please enter feedback that is not blank.");
+      return;
+    }
+    if (!category) {
+      setCategoryError("Please choose a category.");
       return;
     }
     try {
@@ -24,7 +47,7 @@ export function CitizenPage({ user }) {
       setMessage("");
       setCategory("");
     } catch (requestError) {
-      setError(requestError.message);
+      setSubmissionError(requestError.message);
     }
   }
 
@@ -35,19 +58,44 @@ export function CitizenPage({ user }) {
         <h1>What would you like us to know?</h1>
         <p>Tell us about an issue, an idea, or a positive experience in your community.</p>
       </div>
-      <section className="form-card">
+      <section className="form-card" aria-labelledby="feedback-form-heading">
+        <h2 id="feedback-form-heading" className="visually-hidden">Feedback form</h2>
         {submitted && (
-          <div className="success-banner">
+          <div className="success-banner" role="status" aria-live="polite" tabIndex="-1" ref={announcementRef}>
             Thank you. Your feedback has been received. Your reference is <strong>{submissionReference}</strong>.
           </div>
         )}
         <form onSubmit={handleSubmit}>
-          <label>Your feedback
-            <textarea rows="7" value={message} maxLength={maximumMessageLength} onChange={(event) => setMessage(event.target.value)} placeholder="Share your feedback here..." />
+          <label htmlFor="feedback-message">Your feedback
+            <textarea
+              id="feedback-message"
+              ref={messageInputRef}
+              rows="7"
+              value={message}
+              maxLength={maximumMessageLength}
+              aria-invalid={Boolean(messageError)}
+              aria-describedby={messageError ? "feedback-character-count feedback-message-error" : "feedback-character-count"}
+              onChange={(event) => {
+                setMessage(event.target.value);
+                if (messageError) setMessageError("");
+              }}
+              placeholder="Share your feedback here..."
+            />
           </label>
-          <p className="muted" aria-live="polite">{message.length} / {maximumMessageLength} characters</p>
+          <p id="feedback-character-count" className="muted" aria-live="polite">{message.length} / {maximumMessageLength} characters</p>
+          {messageError && <p id="feedback-message-error" className="error-message" role="alert">{messageError}</p>}
           <label htmlFor="feedback-category">Category
-            <select id="feedback-category" value={category} onChange={(event) => setCategory(event.target.value)} required>
+            <select
+              id="feedback-category"
+              ref={categoryInputRef}
+              value={category}
+              aria-invalid={Boolean(categoryError)}
+              aria-describedby={categoryError ? "feedback-category-error" : undefined}
+              onChange={(event) => {
+                setCategory(event.target.value);
+                if (categoryError) setCategoryError("");
+              }}
+            >
               <option value="" disabled>Choose a category</option>
               <option value="Estate">Estate</option>
               <option value="Transport">Transport</option>
@@ -55,11 +103,12 @@ export function CitizenPage({ user }) {
               <option value="Other">Other</option>
             </select>
           </label>
+          {categoryError && <p id="feedback-category-error" className="error-message" role="alert">{categoryError}</p>}
           <div className="form-footer">
             <span className="muted">Please do not include sensitive personal information.</span>
             <button className="primary-button">Submit feedback</button>
           </div>
-          {error && <p className="error-message">{error}</p>}
+          {submissionError && <p className="error-message" role="alert" tabIndex="-1" ref={announcementRef}>{submissionError}</p>}
         </form>
       </section>
     </main>
