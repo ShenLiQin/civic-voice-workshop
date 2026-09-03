@@ -101,6 +101,20 @@ describe("CivicVoice baseline API", () => {
     expect(response.body.feedback.map((item) => item.id)).toEqual(["new", "middle", "old"]);
   });
 
+  it("lets an admin update feedback status and persists the change", async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), "civic-voice-"));
+    const db = await createDb(path.join(directory, "db.json"));
+    db.data.feedback = [{ id: "status-test", name: "Aisha Rahman", message: "Please add benches", category: "Estate", status: "New", createdAt: "2026-08-30T09:00:00.000Z" }];
+    await db.write();
+    const app = await createApp({ db });
+    const login = await request(app).post("/api/login").send({ nric: "S0000002B", password: "admin123", role: "admin" });
+    const response = await request(app).patch("/api/feedback/status-test/status").set("authorization", `Bearer ${login.body.token}`).send({ status: "In review" });
+
+    expect(response.status).toBe(200);
+    expect(response.body.feedback.status).toBe("In review");
+    expect(db.data.feedback[0].status).toBe("In review");
+  });
+
   it("rejects feedback with a missing or unsupported category", async () => {
     const app = await testApp();
     const baseFeedback = { nric: "S0000001A", name: "Aisha Rahman", message: "Please add more benches." };

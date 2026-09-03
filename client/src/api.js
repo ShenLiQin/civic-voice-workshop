@@ -23,3 +23,10 @@ export function submitFeedback(feedback) {
 export function getFeedback(token) {
   return api("/api/feedback", { headers: { Authorization: `Bearer ${token}` } });
 }
+export function updateFeedbackStatus(token, id, status) {
+  return api(`/api/feedback/${id}/status`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ status }),
+  });
+}

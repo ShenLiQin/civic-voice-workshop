@@ -56,6 +56,9 @@ textarea { resize: vertical; line-height: 1.6; }
 .status-pill, .category-pill { align-self: flex-start; white-space: nowrap; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; }
 .status-pill { background: #fff1df; color: #9a5b00; }
 .category-pill { background: #e9f1fb; color: #245b93; }
+.status-control { margin: 0; }
+.status-control select { width: auto; padding: 5px 10px; font-size: 12px; font-weight: 700; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (max-width: 760px) {
   .split-layout { grid-template-columns: 1fr; }
   .intro-panel { min-height: 360px; padding: 58px 8vw; }

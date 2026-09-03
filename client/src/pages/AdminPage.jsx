@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getFeedback } from "../api";
+import { getFeedback, updateFeedbackStatus } from "../api";
 
 export function AdminPage({ session }) {
   const [feedback, setFeedback] = useState([]);
@@ -8,6 +8,16 @@ export function AdminPage({ session }) {
   useEffect(() => {
     getFeedback(session.token).then((response) => setFeedback(response.feedback)).catch((requestError) => setError(requestError.message));
   }, [session]);
+
+  async function changeStatus(id, status) {
+    setError("");
+    try {
+      const response = await updateFeedbackStatus(session.token, id, status);
+      setFeedback((items) => items.map((item) => item.id === id ? response.feedback : item));
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  }
 
   return (
     <main className="page-shell admin-shell">
@@ -27,7 +37,14 @@ export function AdminPage({ session }) {
             </div>
             <div className="feedback-tags">
               <span className="category-pill">{item.category}</span>
-              <span className="status-pill">{item.status}</span>
+              <label className="status-control" htmlFor={`status-${item.id}`}>
+                <span className="sr-only">Status for feedback from {item.name}</span>
+                <select id={`status-${item.id}`} value={item.status} onChange={(event) => changeStatus(item.id, event.target.value)}>
+                  <option value="New">New</option>
+                  <option value="In review">In review</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </label>
             </div>
           </article>
         ))}

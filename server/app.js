@@ -4,6 +4,7 @@ import cors from "cors";
 import { createDb } from "./lib/db.js";
 
 const feedbackCategories = ["Estate", "Transport", "Environment", "Other"];
+const feedbackStatuses = ["New", "In review", "Closed"];
 
 function passwordMatches(password, passwordHash) {
   if (typeof password !== "string" || typeof passwordHash !== "string") return false;
@@ -64,6 +65,18 @@ export async function createApp(options = {}) {
     const feedback = [...db.data.feedback].sort(
       (first, second) => new Date(second.createdAt) - new Date(first.createdAt),
     );
+    return res.json({ feedback });
+  });
+
+  app.patch("/api/feedback/:id/status", requireAdmin, async (req, res) => {
+    const { status } = req.body ?? {};
+    if (!feedbackStatuses.includes(status)) {
+      return res.status(400).json({ error: "Please select a valid feedback status." });
+    }
+    const feedback = db.data.feedback.find((item) => item.id === req.params.id);
+    if (!feedback) return res.status(404).json({ error: "Feedback was not found." });
+    feedback.status = status;
+    await db.write();
     return res.json({ feedback });
   });
 
