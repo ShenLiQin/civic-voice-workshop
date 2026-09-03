@@ -12,6 +12,15 @@ function passwordMatches(password, passwordHash) {
   return storedHash.length === derivedHash.length && crypto.timingSafeEqual(storedHash, derivedHash);
 }
 
+function normalizeFeedbackMessage(message) {
+  return message
+    .normalize("NFKC")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export async function createApp(options = {}) {
   const db = options.db ?? (await createDb());
   const sessions = new Map();
@@ -75,11 +84,15 @@ export async function createApp(options = {}) {
     if (!feedbackCategories.includes(category)) {
       return res.status(400).json({ error: "Please select a valid feedback category." });
     }
+    const normalizedMessage = normalizeFeedbackMessage(message);
+    if (!normalizedMessage) {
+      return res.status(400).json({ error: "Please enter feedback that is not blank." });
+    }
     const id = crypto.randomUUID();
     const feedback = {
       id,
       reference: `CV-${id.replaceAll("-", "").slice(0, 6).toUpperCase()}`,
-      nric, name, message, category, status: "New",
+      nric, name, message: normalizedMessage, category, status: "New",
       createdAt: new Date().toISOString(),
     };
     db.data.feedback.unshift(feedback);

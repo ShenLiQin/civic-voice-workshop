@@ -79,6 +79,29 @@ describe("CivicVoice baseline API", () => {
     expect(inbox.body.feedback[0].category).toBe("Environment");
   });
 
+  it("normalizes unsafe feedback to plain text before storing and returning it", async () => {
+    const app = await testApp();
+    const submission = await request(app).post("/api/feedback").send({
+      nric: "S0000001A",
+      name: "Aisha Rahman",
+      message: '<img src=x onerror="alert(1)"> Please fix the lift.',
+      category: "Estate",
+    });
+
+    expect(submission.status).toBe(201);
+    expect(submission.body.feedback.message).toBe('img src=x onerror="alert(1)" Please fix the lift.');
+    expect(submission.body.feedback.message).not.toContain("<");
+    expect(submission.body.feedback.message).not.toContain(">");
+
+    const adminLogin = await request(app).post("/api/login").send({
+      nric: "S0000002B", password: "admin123", role: "admin",
+    });
+    const inbox = await request(app)
+      .get("/api/feedback")
+      .set("authorization", `Bearer ${adminLogin.body.token}`);
+    expect(inbox.body.feedback[0].message).toBe(submission.body.feedback.message);
+  });
+
   it("returns feedback newest first when stored data is out of order", async () => {
     const directory = await mkdtemp(path.join(os.tmpdir(), "civic-voice-"));
     const db = await createDb(path.join(directory, "db.json"));
