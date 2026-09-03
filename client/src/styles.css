@@ -43,6 +43,15 @@ textarea { resize: vertical; line-height: 1.6; }
 .page-heading h1 { font-size: clamp(42px, 5vw, 62px); line-height: 1.05; margin: 14px 0; }
 .page-heading p { color: #69747b; line-height: 1.6; }
 .form-card, .feedback-list { background: white; border: 1px solid #e2dfd7; border-radius: 14px; padding: 28px; box-shadow: 0 8px 30px rgba(28,36,42,.04); }
+.inbox-state { display: grid; justify-items: center; text-align: center; background: white; border: 1px solid #e2dfd7; border-radius: 14px; padding: 54px 28px; box-shadow: 0 8px 30px rgba(28,36,42,.04); }
+.inbox-state h2 { margin: 14px 0 8px; font-size: 28px; }
+.inbox-state p { margin: 0; color: #69747b; line-height: 1.6; }
+.inbox-state .primary-button { margin-top: 22px; }
+.loading-indicator { width: 30px; height: 30px; border: 3px solid #e9d0d1; border-top-color: #b2252a; border-radius: 50%; animation: spin .8s linear infinite; }
+.error-state { border-color: #e7c3c5; }
+.error-state h2 { color: #b2252a; }
+.empty-state { border-style: dashed; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .form-footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 20px; font-size: 13px; }
 .success-banner { background: #e8f4ec; color: #26703b; border-radius: 8px; padding: 13px 15px; margin-bottom: 20px; font-size: 14px; }
 .admin-shell { max-width: 1050px; }
