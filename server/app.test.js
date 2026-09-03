@@ -101,6 +101,17 @@ describe("CivicVoice baseline API", () => {
     expect(response.body.feedback.map((item) => item.id)).toEqual(["new", "middle", "old"]);
   });
 
+  it("returns one feedback item to an authenticated admin", async () => {
+    const app = await testApp();
+    const created = await request(app).post("/api/feedback").send({ nric: "S0000001A", name: "Aisha Rahman", message: "Please add benches.", category: "Estate" });
+    const login = await request(app).post("/api/login").send({ nric: "S0000002B", password: "admin123", role: "admin" });
+    const detail = await request(app).get(`/api/feedback/${created.body.feedback.id}`).set("authorization", `Bearer ${login.body.token}`);
+
+    expect(detail.status).toBe(200);
+    expect(detail.body.feedback.id).toBe(created.body.feedback.id);
+    expect(detail.body.feedback.message).toBe("Please add benches.");
+  });
+
   it("rejects feedback with a missing or unsupported category", async () => {
     const app = await testApp();
     const baseFeedback = { nric: "S0000001A", name: "Aisha Rahman", message: "Please add more benches." };

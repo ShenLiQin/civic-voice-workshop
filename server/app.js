@@ -67,6 +67,12 @@ export async function createApp(options = {}) {
     return res.json({ feedback });
   });
 
+  app.get("/api/feedback/:id", requireAdmin, (req, res) => {
+    const feedback = db.data.feedback.find((item) => item.id === req.params.id);
+    if (!feedback) return res.status(404).json({ error: "Feedback was not found." });
+    return res.json({ feedback });
+  });
+
   app.post("/api/feedback", async (req, res) => {
     const { nric, name, message, category } = req.body ?? {};
     if (typeof message !== "string" || message.trim().length === 0) {

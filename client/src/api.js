@@ -23,3 +23,6 @@ export function submitFeedback(feedback) {
 export function getFeedback(token) {
   return api("/api/feedback", { headers: { Authorization: `Bearer ${token}` } });
 }
+export function getFeedbackDetail(token, id) {
+  return api(`/api/feedback/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+}
